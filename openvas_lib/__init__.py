@@ -437,11 +437,9 @@ class VulnscanManager(object):
     ..warning: Only compatible with OMP 4.0.
     """
 
-    #----------------------------------------------------------------------
     #
     # Methods to manage OpenVAS
     #
-    #----------------------------------------------------------------------
     def __init__(self, host, user, password, port=9390, timeout=None):
         """
         :param host: The host where the OpenVAS server is running.
@@ -505,7 +503,6 @@ class VulnscanManager(object):
         self.__task_id = None
         self.__target_id = None
 
-    #----------------------------------------------------------------------
     def launch_scan(self, target, **kwargs):
         """
         Launch a new audit in OpenVAS.
@@ -616,7 +613,6 @@ class VulnscanManager(object):
 
         return m_task_id, m_target_id
 
-    #----------------------------------------------------------------------
     @property
     def task_id(self):
         """
@@ -625,7 +621,6 @@ class VulnscanManager(object):
         """
         return self.__task_id
 
-    #----------------------------------------------------------------------
     @property
     def target_id(self):
         """
@@ -634,7 +629,6 @@ class VulnscanManager(object):
         """
         return self.__target_id
 
-    #----------------------------------------------------------------------
     def delete_scan(self, task_id):
         """
         Delete specified scan ID in the OpenVAS server.
@@ -649,7 +643,6 @@ class VulnscanManager(object):
         except AuditNotRunningError, e:
             raise VulnscanAuditNotFoundError(e)
 
-    #----------------------------------------------------------------------
     def delete_target(self, target_id):
         """
         Delete specified target ID in the OpenVAS server.
@@ -659,7 +652,43 @@ class VulnscanManager(object):
         """
         self.__manager.delete_target(target_id)
 
-    #----------------------------------------------------------------------
+    def get_task(self, task_id=None):
+        """
+        :param task_id:
+        :return: Task
+        """
+        return self.__manager.get_task(task_id)
+
+    def get_task_status(self, task_id):
+        """
+        Return one of following statuses of the task:
+        "Delete Requested|Done|New|Pause Requested|Paused|Requested|Resume Requested|Running|Stop Requested|Stopped|Internal Error"
+        :param task_id:
+        :return: task status as string
+        """
+        return self.get_task(task_id).find('status').text
+
+    def get_report_by_task(self, task_id, report_format='xml'):
+        return self.__manager.get_report_by_task(task_id, report_format)
+
+    def get_report_formats(self, report_format_id=None):
+        """
+        Return report format list as dictionary where key is an extension name:
+        ('xml', 'html', 'csv', 'tex', 'nbe', 'pdf', 'svg', 'txt', 'vna')
+        :param report_format_id:
+        :return: dictionary {extension_name: uuid}
+        """
+        return self.__manager.get_report_formats(report_format_id)
+
+    def get_report_by_format(self, report_id, report_format_id):
+        """
+        Return report by format
+        :param report_id:
+        :param report_format_id:
+        :return: report
+        """
+        return self.__manager.get_report_by_format(report_id, report_format_id)
+    
     def get_results(self, task_id):
         """
         Get the results associated to the scan ID.
@@ -686,7 +715,6 @@ class VulnscanManager(object):
 
         return report_parser(m_response)
 
-    #----------------------------------------------------------------------
     def get_report_id(self, scan_id):
 
         if not isinstance(scan_id, basestring):
@@ -694,25 +722,20 @@ class VulnscanManager(object):
 
         return self.__manager.get_report_id(scan_id)
 
-    #----------------------------------------------------------------------
     def get_report_html(self, report_id):
 
         if not isinstance(report_id, basestring):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         return self.__manager.get_report_html(report_id)
-        #----------------------------------------------------------------------
-
-    #----------------------------------------------------------------------
+    
     def get_report_xml(self, report_id):
 
         if not isinstance(report_id, basestring):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         return self.__manager.get_report_xml(report_id)
-        #----------------------------------------------------------------------
-
-    #----------------------------------------------------------------------
+    
     def get_report_pdf(self, report_id):
 
         if not isinstance(report_id, basestring):
@@ -720,7 +743,6 @@ class VulnscanManager(object):
 
         return self.__manager.get_report_pdf(report_id)
 
-    #----------------------------------------------------------------------
     def get_progress(self, task_id):
         """
         Get the progress of a scan.
@@ -736,7 +758,6 @@ class VulnscanManager(object):
 
         return self.__manager.get_tasks_progress(task_id)
 
-    #----------------------------------------------------------------------
     def stop_audit(self, task_id):
         """
         Stops specified scan ID in the OpenVAS server.
@@ -751,7 +772,6 @@ class VulnscanManager(object):
         except AuditNotRunningError, e:
             raise VulnscanAuditNotFoundError(e)
 
-    #----------------------------------------------------------------------
     @property
     def get_profiles(self):
         """
@@ -760,7 +780,13 @@ class VulnscanManager(object):
         """
         return self.__manager.get_configs_ids()
 
-    #----------------------------------------------------------------------
+    def get_profile(self, profile_id):
+        """
+        :param profile_id:
+        :return: Profile
+        """
+        return self.__manager.get_profiles(profile_id)
+
     @property
     def get_all_scans(self):
         """
@@ -769,7 +795,6 @@ class VulnscanManager(object):
         """
         return self.__manager.get_tasks_ids()
 
-    #----------------------------------------------------------------------
     @property
     def get_running_scans(self):
         """
@@ -778,7 +803,6 @@ class VulnscanManager(object):
         """
         return self.__manager.get_tasks_ids_by_status("Running")
 
-    #----------------------------------------------------------------------
     @property
     def get_finished_scans(self):
         """
@@ -787,7 +811,6 @@ class VulnscanManager(object):
         """
         return self.__manager.get_tasks_ids_by_status("Done")
 
-    #----------------------------------------------------------------------
     @set_interval(10.0)
     def _callback(self, func_end, func_status):
         """

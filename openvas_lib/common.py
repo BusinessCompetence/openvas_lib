@@ -75,11 +75,13 @@ def get_connector(host, username, password, port=9390, timeout=None):
     if manager.protocol_version == "4.0":
         from openvas_lib.ompv4 import OMPv4
         return OMPv4(manager)
+    if manager.protocol_version == "5.0":
+        from openvas_lib.ompv5 import OMPv5
+        return OMPv5(manager)
     else:
         raise RemoteVersionError("Unknown OpenVAS version for remote host.")
 
 
-#------------------------------------------------------------------------------
 class ConnectionManager(object):
     """
     Connection manager for OMP objects.
@@ -91,7 +93,6 @@ class ConnectionManager(object):
 
     TIMEOUT = 10.0
 
-    #----------------------------------------------------------------------
     def __init__(self, host, username, password, port=9390, timeout=None):
         """
         Open a connection to the manager and authenticate the user.
@@ -185,7 +186,6 @@ class ConnectionManager(object):
         # Authenticate to the server
         self._authenticate(self.__username, self.__password)
 
-    #----------------------------------------------------------------------
     def _authenticate(self, username, password):
         """
         Authenticate a user to the manager.
@@ -217,7 +217,6 @@ class ConnectionManager(object):
         except ClientError:
             raise AuthFailedError(username)
 
-    #----------------------------------------------------------------------
     def _get_protocol_version(self):
         """
         Get OMP protocol version. If host is 'dummy', return 'dummy' version.
@@ -240,7 +239,6 @@ class ConnectionManager(object):
         else:
             return v
 
-    #----------------------------------------------------------------------
     def _send(self, in_data):
         """Send OMP data to the manager and read the result.
 
@@ -300,6 +298,7 @@ class ConnectionManager(object):
                 tree = etree.ElementTree()
                 return tree
 
+            tree.set('raw', data)
             # Return the parsed response.
             return tree
 
@@ -324,7 +323,6 @@ class ConnectionManager(object):
                 pass
             self.socket = None
 
-    #----------------------------------------------------------------------
     def make_xml_request(self, xmldata, xml_result=False):
         """
         Low-level interface to send OMP XML to the manager.
@@ -344,6 +342,8 @@ class ConnectionManager(object):
 
         :raises: ClientError, ServerError, TypeError, ValueError
         """
+        import inspect
+        print(__name__, ' call:', inspect.stack()[1][3])
         if not isinstance(xmldata, basestring):
             raise TypeError("Expected basestring, got '%s' instead" % type(xmldata))
         if not isinstance(xml_result, bool):
