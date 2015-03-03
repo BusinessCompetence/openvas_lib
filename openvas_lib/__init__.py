@@ -758,7 +758,7 @@ class VulnscanManager(object):
 
         return self.__manager.get_tasks_progress(task_id)
 
-    def stop_audit(self, task_id):
+    def stop_audit(self, task_id=None):
         """
         Stops specified scan ID in the OpenVAS server.
 
@@ -768,9 +768,17 @@ class VulnscanManager(object):
         :raises: VulnscanAuditNotFoundError
         """
         try:
-            self.__manager.stop_task(self.task_id)
+            self.__manager.stop_task(task_id if task_id else self.task_id)
         except AuditNotRunningError, e:
             raise VulnscanAuditNotFoundError(e)
+
+    def create_config(self, config_id):
+        """
+        Create the new scan configuration
+        :param config_id: scan profile id
+        :return: id of the created configuration
+        """
+        return self.__manager.create_config(config_id)
 
     @property
     def get_profiles(self):
@@ -780,12 +788,28 @@ class VulnscanManager(object):
         """
         return self.__manager.get_configs_ids()
 
-    def get_profile(self, profile_id):
+    def get_profile(self, profile_id, detail=None):
         """
         :param profile_id:
         :return: Profile
         """
-        return self.__manager.get_profiles(profile_id)
+        return self.__manager.get_profiles(profile_id, detail)
+
+    def edit_profile(self, config_id, nvt_selection_list=[], preference=[]):
+        return self.__manager.edit_profile(config_id, nvt_selection_list, preference)
+
+    def get_nvt(self, nvt_oid):
+        """
+        :param nvt_oid:
+        :return: Network Vulnerability Test configs
+        """
+        return self.__manager.get_nvt(nvt_oid)
+
+    def get_nvt_families(self):
+        """
+        :return: nvt families
+        """
+        return self.__manager.get_nvt_families()
 
     @property
     def get_all_scans(self):

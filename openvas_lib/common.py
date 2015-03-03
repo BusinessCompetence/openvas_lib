@@ -342,8 +342,6 @@ class ConnectionManager(object):
 
         :raises: ClientError, ServerError, TypeError, ValueError
         """
-        import inspect
-        print(__name__, ' call:', inspect.stack()[1][3])
         if not isinstance(xmldata, basestring):
             raise TypeError("Expected basestring, got '%s' instead" % type(xmldata))
         if not isinstance(xml_result, bool):

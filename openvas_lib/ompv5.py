@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import base64
 
 try:
     from xml.etree import cElementTree as etree
@@ -70,15 +71,77 @@ class OMPv5(OMPv4):
             report_formats[i.find('extension').text] = i.get('id')
         return report_formats
 
-    def get_profiles(self, profile_id=None):
+    def get_profiles(self, profile_id=None, detail=False):
         if profile_id and not isinstance(profile_id, basestring):
             raise TypeError("Expected string, got %r instead" % type(profile_id))
         try:
             if profile_id:
-                body_request = '<get_configs config_id="%s"/>' % profile_id
+                detail = 'preferences="1" families="1" tasks="1"' if detail else ''
+                body_request = '<get_configs config_id="%s" %s/>' % (profile_id, detail)
             else:
                 body_request = '<get_configs/>'
-            m_response = self._manager.make_xml_request(body_request, xml_result=True)
-            return m_response
+            return self._manager.make_xml_request(body_request, xml_result=True)
         except ServerError, e:
             raise VulnscanServerError("Can't get the xml for the profiles. Error: %s" % e.message)
+
+    def get_nvt(self, nvt_oid):
+        if nvt_oid and not isinstance(nvt_oid, basestring):
+            raise TypeError("Expected string, got %r instead" % type(nvt_oid))
+        try:
+            body_request = '<get_nvts nvt_oid="%s" details="1" preferences="1"/>' % nvt_oid
+            return self._manager.make_xml_request(body_request, xml_result=True)
+        except ServerError, e:
+            raise VulnscanServerError("Can't get the xml for the profiles. Error: %s" % e.message)
+
+    def get_nvt_families(self):
+        try:
+            return self._manager.make_xml_request('<get_nvt_families/>', xml_result=True)
+        except ServerError, e:
+            raise VulnscanServerError("Can't get the xml for the profiles. Error: %s" % e.message)
+
+    def edit_profile(self, config_id, nvt_selection_list=[], preference=[]):
+        if config_id and not isinstance(config_id, basestring):
+            raise TypeError("Expected string, got %r instead" % type(config_id))
+
+        config = self.get_configs(config_id)
+        config_name = config.find('config').find('name').text
+
+        for nvt in nvt_selection_list:
+            if nvt and not isinstance(nvt, basestring):
+                raise TypeError("Expected string, got %r instead in nvt_selection_list" % type(nvt))
+
+        body_request = '<modify_config config_id="%s">' % config_id
+        if len(nvt_selection_list):
+            body_request += '<nvt_selection>'
+            body_request += '<family>%s</family>' % config_name
+            for nvt in nvt_selection_list:
+                body_request += '<nvt oid="%s"/>' % nvt
+            body_request += '</nvt_selection>'
+        elif len(preference):
+            allowed_types = ['checkbox', 'radio', 'entry']
+            for item in preference:
+                if item.get('type') not in allowed_types:
+                    raise TypeError("Incorrect name of the property, got '%s', expected one of: " % allowed_types)
+                body_request += '<preference><nvt oid="%s"/><name>%s[%s]:%s</name><value>%s</value></preference>' % (
+                    item.get('oid'),
+                    item.get('name'),
+                    item.get('type'),
+                    item.get('property_name'),
+                    base64.b64encode(item.get('value')),
+                )
+        body_request += '</modify_config>'
+        try:
+            return self._manager.make_xml_request(body_request, xml_result=True)
+        except ServerError, e:
+            raise VulnscanServerError("Can't get the xml for the profiles. Error: %s" % e.message)
+
+    def create_config(self, config_id):
+        if config_id and not isinstance(config_id, basestring):
+            raise TypeError("Expected string, got %r instead" % type(config_id))
+        body_request = '<create_config><copy>%s</copy></create_config>' % config_id
+        try:
+            m_response = self._manager.make_xml_request(body_request, xml_result=True)
+            return m_response.get('id')
+        except ServerError, e:
+            raise VulnscanServerError("Can't create the configuration. Error: %s" % e.message)
+
