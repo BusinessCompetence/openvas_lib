@@ -1,11 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import base64
 
-try:
-    from xml.etree import cElementTree as etree
-except ImportError:
-    from xml.etree import ElementTree as etree
 
 from openvas_lib import *
 from openvas_lib.common import *
@@ -95,21 +90,6 @@ class OMPv6(OMPv5):
         </create_task>
         '''.format(name=name, comment=comment, config=config, target=target, scanner=scanner)
         return self._manager.make_xml_request(request, xml_result=True).get("id")
-
-    def get_task(self, task_id=None, id_only=False):
-        if not task_id:
-            body_request = '<get_tasks/>'
-        else:
-            body_request = '<get_tasks task_id="%s" details="1" />' % task_id
-        try:
-            m_response = self._manager.make_xml_request(body_request, xml_result=True)
-        except ServerError, e:
-            raise VulnscanServerError("Can't get the xml for the task %s. Error: %s" % (task_id, e.message))
-        if task_id:
-            return m_response.find('task')
-        if id_only:
-            return [i.get('id') for i in m_response.findall('task')]
-        return m_response
 
     def get_report_by_task(self, task_id, report_format='xml'):
         if report_format not in self.REPORT_EXTENSIONS:
