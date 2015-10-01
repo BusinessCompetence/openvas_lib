@@ -317,7 +317,6 @@ class OMPv4(OMP):
 
         return status.text
 
-    #----------------------------------------------------------------------
     def get_tasks_progress(self, task_id):
         """
         Get the progress of the task.
@@ -358,7 +357,6 @@ class OMPv4(OMP):
         except ZeroDivisionError:
             return 0.0
 
-    #----------------------------------------------------------------------
     def get_tasks_ids_by_status(self, status="Done"):
         """
         Get IDs of tasks of the server depending of their status.

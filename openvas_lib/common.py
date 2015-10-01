@@ -79,8 +79,8 @@ def get_connector(host, username, password, port=9390, timeout=None):
         from openvas_lib.ompv5 import OMPv5
         return OMPv5(manager)
     elif manager.protocol_version == "6.0":
-        from openvas_lib.ompv5 import OMPv5
-        return OMPv5(manager)
+        from openvas_lib.ompv6 import OMPv6
+        return OMPv6(manager)
     else:
         raise RemoteVersionError("Unknown OpenVAS version for remote host.")
 

@@ -562,7 +562,6 @@ class VulnscanManager(object):
         :return: ID of the audit and ID of the target: (ID_scan, ID_target)
         :rtype: (str, str)
         """
-
         profile = kwargs.get("profile", "Full and fast")
         call_back_end = kwargs.get("callback_end", None)
         call_back_progress = kwargs.get("callback_progress", None)
@@ -688,7 +687,7 @@ class VulnscanManager(object):
         :return: report
         """
         return self.__manager.get_report_by_format(report_id, report_format_id)
-    
+
     def get_results(self, task_id):
         """
         Get the results associated to the scan ID.
@@ -728,14 +727,14 @@ class VulnscanManager(object):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         return self.__manager.get_report_html(report_id)
-    
+
     def get_report_xml(self, report_id):
 
         if not isinstance(report_id, basestring):
             raise TypeError("Expected string, got %r instead" % type(report_id))
 
         return self.__manager.get_report_xml(report_id)
-    
+
     def get_report_pdf(self, report_id):
 
         if not isinstance(report_id, basestring):
@@ -818,6 +817,14 @@ class VulnscanManager(object):
         :rtype: {scan_name: ID}
         """
         return self.__manager.get_tasks_ids()
+
+    @property
+    def get_scanners(self):
+        """
+        :return: All scanners.
+        :rtype: {scan_name: ID}
+        """
+        return self.__manager.get_scanners()
 
     @property
     def get_running_scans(self):
