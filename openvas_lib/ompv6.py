@@ -78,7 +78,10 @@ class OMPv6(OMPv5):
             config = "Full and fast"
 
         if not scanner:
-            scanner = self.get_scanners[0]
+            if getattr(self, 'default_scanner', None):
+                scanner = self.default_scanner
+            else:
+                scanner = self.get_scanners[0]
 
         request = '''
         <create_task>

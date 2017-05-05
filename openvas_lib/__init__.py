@@ -651,6 +651,9 @@ class VulnscanManager(object):
         """
         self.__manager.delete_target(target_id)
 
+    def create_task(self, *args, **kwargs):
+        self.__manager.create_task(*args, **kwargs)
+
     def get_task(self, task_id=None):
         """
         :param task_id:
@@ -824,7 +827,14 @@ class VulnscanManager(object):
         :return: All scanners.
         :rtype: {scan_name: ID}
         """
-        return self.__manager.get_scanners()
+        return self.__manager.get_scanners
+
+    @property
+    def default_scanner(self):
+        """
+        :return: default scanner.
+        """
+        return self.__manager.default_scanner
 
     @property
     def get_running_scans(self):
