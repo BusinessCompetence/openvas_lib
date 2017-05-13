@@ -782,6 +782,9 @@ class VulnscanManager(object):
         """
         return self.__manager.create_config(config_id)
 
+    def get_port_list(self, name=None):
+        return self.__manager.get_port_list(name=name)
+
     @property
     def get_profiles(self):
         """

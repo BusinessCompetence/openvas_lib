@@ -163,11 +163,15 @@ class OMPv4(OMP):
         elif isinstance(hosts, Iterable):
             m_targets = ",".join(hosts)
 
+        port_list = self.get_port_list()
+
         request = """<create_target>
             <name>%s</name>
             <hosts>%s</hosts>
             <comment>%s</comment>
-        </create_target>""" % (name, m_targets, comment)
+            <port_list id="%s" />
+            <alive_tests>Consider Alive</alive_tests>
+        </create_target>""" % (name, m_targets, comment, port_list)
 
         return self._manager.make_xml_request(request, xml_result=True).get("id")
 
