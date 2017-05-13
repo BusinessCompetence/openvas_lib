@@ -78,10 +78,7 @@ def get_connector(host, username, password, port=9390, timeout=None):
     elif manager.protocol_version == "5.0":
         from openvas_lib.ompv5 import OMPv5
         return OMPv5(manager)
-    elif manager.protocol_version == "6.0":
-        from openvas_lib.ompv6 import OMPv6
-        return OMPv6(manager)
-    elif manager.protocol_version == "7.0":
+    elif manager.protocol_version == "7.0" or manager.protocol_version == "6.0":
         from openvas_lib.ompv7 import OMPv7
         return OMPv7(manager)
     else:
