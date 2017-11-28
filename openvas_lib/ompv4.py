@@ -140,7 +140,7 @@ class OMPv4(OMP):
         return self._manager.make_xml_request(request, xml_result=True).get("id")
 
     #----------------------------------------------------------------------
-    def create_target(self, name, hosts, comment=""):
+    def create_target(self, name, hosts, comment="", consider_alive=False):
         """
         Creates a target in OpenVAS.
 
@@ -165,13 +165,15 @@ class OMPv4(OMP):
 
         port_list = self.get_port_list()
 
+        consider_alive_text = '<alive_tests>Consider Alive</alive_tests>' if consider_alive else ''
+
         request = """<create_target>
             <name>%s</name>
             <hosts>%s</hosts>
             <comment>%s</comment>
             <port_list id="%s" />
-            <alive_tests>Consider Alive</alive_tests>
-        </create_target>""" % (name, m_targets, comment, port_list)
+            {}
+        </create_target>""" % (name, m_targets, comment, port_list, consider_alive_text)
 
         return self._manager.make_xml_request(request, xml_result=True).get("id")
 
