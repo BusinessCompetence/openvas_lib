@@ -503,7 +503,7 @@ class VulnscanManager(object):
         self.__task_id = None
         self.__target_id = None
 
-    def launch_scan(self, target, consider_alive=False, **kwargs):
+    def launch_scan(self, target, deep_scan=False, **kwargs):
         """
         Launch a new audit in OpenVAS.
 
@@ -578,7 +578,7 @@ class VulnscanManager(object):
         try:
             m_target_id = self.__manager.create_target(m_target_name, target,
                                                        "Temporal target from OpenVAS Lib",
-                                                       consider_alive=consider_alive)
+                                                       deep_scan=deep_scan)
         except ServerError, e:
             raise VulnscanTargetError("The target already exits on the server. Error: %s" % e.message)
 
