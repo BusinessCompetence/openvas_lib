@@ -21,7 +21,7 @@ class OMPv7(OMPv6):
 
     def get_port_list(self, name=None):
         if not name:
-            name = 'Nmap 5.51 top 2000 TCP and top 100 UDP'
+            name = 'All TCP and Nmap 5.51 top 100 UDP'
         request = '<get_port_lists />'
         port_lists = self._manager.make_xml_request(request, xml_result=True)
         for i in port_lists.findall('port_list'):
